@@ -15,6 +15,11 @@ app.get('/analysis', function (req, res) {
 app.get('/export', function (req, res) {
     res.render('export', {user: 'FOO'});
 })
+
+app.get('/map', function (req, res) {
+    res.render('map', {user: 'FOO'});
+})
+
 let port = normalizePort(process.env.PORT || '3000');
 // app.set('port', port);
 app.listen(port, () => console.log("Example app listening on port " + port));
