@@ -1,7 +1,35 @@
 <%- include('layout') -%>
 <script src="https://unpkg.com/amazon-quicksight-embedding-sdk@1.0.12/dist/quicksight-embedding-js-sdk.min.js"></script>
 <script src="/js/dashboard.js"></script>
+<script>
+    function initMap() {
+        var url = "<%= embedUrl %>";
+        url = url.replace(/&amp;/g, '&');
+        console.log(url);
+        var options = {
+            url: url,
+            container: document.getElementById("embeddingContainer"),
+            parameters: {
+                country: "United States",
+                states: [
+                    "California",
+                    "Washington"
+                ]
+            },
+            scrolling: "no",
+            height: "700px",
+            width: "1000px",
+            locale: "en-US",
+            footerPaddingEnabled: true,
+            sheetTabsDisabled: false, // use this option to enable or disable sheet tab controls in dashboard embedding
+            printEnabled: false, // use this option to enable or disable print option for dashboard embedding
+            // this option only applies to experience embedding and will not be used for dashboard embedding
+        };
+        var dashboard = QuickSightEmbedding.embedDashboard(options);
+        dashboard.on("load", xx);
 
+    }
+</script>
 <div class="container-fluid">
     <p>Hello main</p>
 </div>

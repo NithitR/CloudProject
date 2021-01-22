@@ -1,15 +1,19 @@
 let express = require('express');
 let app = express();
-
+let aws = require('./aws')
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
+
 
 app.get('/', function (req, res) {
     res.render('index', {user: 'FOO'});
 })
 
-app.get('/analysis', function (req, res) {
-    res.render('main', {user: 'FOO'});
+app.get('/analysis',async function (req, res) {
+    // let embedUrl = aws.getQuickSightUrl();
+    let embedUrl = await aws.getUrl();
+    console.log(embedUrl);
+    res.render('main', {embedUrl: embedUrl});
 })
 
 app.get('/export', function (req, res) {
