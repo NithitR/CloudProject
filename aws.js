@@ -13,7 +13,6 @@ module.exports = {
             Namespace: "xxx",
             IdentityType: 'IAM',
             SessionLifetimeInMinutes: 600,
-            UndoRedoDisabled: undoRedoDisabled
         };
         const quicksightGetDashboard = new AWS.QuickSight({
             region: "us-east-1",
