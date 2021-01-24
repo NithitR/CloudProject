@@ -12,46 +12,60 @@
         $(document).ready(function () {
             $("#search").click(function (e) {
                 e.preventDefault();
-                let acc_type = $("#acc_type").val();
+                let severity = $("#severity").val();
                 let year = $("#acc_year").val();
                 let iga = $("#acc_lga").val();
-                console.log(markers.length);
+
+                // Reset the markers array
+                console.log("marker length",markers.length);
+                console.log("marker Cluster length",markerClusters.length);
+
                 if (markers.length) {
-                    console.log('xx');
                     for (var i = 0; i < markers.length; i++) {
                         markers[i].setMap(null);
                     }
                     markers = [];
+                    markerClusters.clearMarkers();
+
                 }
                 if (markerClusters.length) {
-                    console.log('xxx');
-                    markerClusters.clearMarkers();
                 }
-                // Reset the markers array
+                let queryString = encodeURI(`?severity=${severity}&accident_date=${year}&lga_name_all=${iga}`);
+                $('#search').prop('disabled', true);
+                $("#search").html('');
+                $('#search').append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+                $('#search').append('<span class="sr-only">Loading...</span>')
 
-                console.log(acc_type, year, iga);
-                let queryString = encodeURI(`?acc_type=${acc_type}&accident_date=${year}&lga_name_al${iga}`);
-                console.log(queryString);
+                // <button class="btn btn-primary" type="button" disabled>
+                //     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                //     <span class="sr-only">Loading...</span>
+                // </button>
                 $.ajax({
                     type: "GET",
-                    url: "https://0xjid9363a.execute-api.us-east-1.amazonaws.com/roadAccidentAnalytic/roadaccidentdetail" + queryString,
-                    cache: false,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("Authorization", "AWS4-HMAC-SHA256 Credential=AKIAVSLBGXBARSILIX6E/20210124/us-east-1/execute-api/aws4_request, SignedHeaders=content-type;host;x-amz-date, Signature=30d5c620fd0fc8cc6b7741180ac30ae059143dfaaef5ce08206c429cc715c0cb");
+                    url: "https://0xjid9363a.execute-api.us-east-1.amazonaws.com/roadAccidentAnalytic/roadaccidentdetail"+queryString,
+                    crossDomain: true,
+                    headers: {
+                        "Authorization": "AWS4-HMAC-SHA256 Credential=AKIAVSLBGXBARSILIX6E/20210124/us-east-1/execute-api/aws4_request, SignedHeaders=content-type;host;x-amz-date, Signature=30d5c620fd0fc8cc6b7741180ac30ae059143dfaaef5ce08206c429cc715c0cb"
                     },
+                    dataType: 'json',
+                    contentType: "application/json",
                     success: function (data) {
+
+                        $('input[type="text"]').keyup(function() {
+                            if($(this).val() != '') {
+                                $(':input[type="submit"]').prop('disabled', false);
+                            }
+                        });
+
+                        locations = data.data;
                         console.log(data);
-                        // locations = [{
-                        //     accident_no: 'T20130013744',
-                        //     latitude: -37.82156,
-                        //     longitude: 145.02638,
-                        //     severity: 'Other injury accident',
-                        //     lga_name_all: 'BOROONDARA',
-                        //     road_geometry: 'Cross intersection',
-                        //     accident_type: 'Collision with vehicle'
-                        // }]
-                        locations = data;
-                        updateMap();
+                        if(data.data.length){
+                            updateMap();
+                        }
+                        $('#search').prop('disabled', false);
+                        $("#search").html('Search');
+                        $('#search span').remove()
+                        $('#search span').remove()
                     }
                 });
             });
@@ -107,8 +121,8 @@
     <form>
         <div class="row">
             <div class="form-group col-md-4">
-                <label for="acc_type">Severity</label>
-                <select id="acc_type" class="form-control">
+                <label for="severity">Severity</label>
+                <select id="severity" class="form-control">
                     <option selected value="Other injury accident">Other injury accident</option>
                     <option value="Non injury accident">Non injury accident</option>
                     <option value="Fatal accident">Fatal accident</option>
@@ -137,6 +151,7 @@
             </div>
         </div>
         <br>
+
         <button type="submit" class="btn btn-primary" id="search">Search</button>
     </form>
 
