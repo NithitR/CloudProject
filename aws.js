@@ -17,7 +17,7 @@ async function getDashboardEmbedURL() {
     const getDashboardParams = {
         AwsAccountId: aws_config.AwsAccountId,
         DashboardId: aws_config.DashboardId,
-        Namespace: "Dashboard Summary",
+        Namespace: "DashboardSummary",
         IdentityType: 'IAM',
         SessionLifetimeInMinutes: 600,
     };
