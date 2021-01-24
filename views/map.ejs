@@ -64,7 +64,12 @@
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         alert(xhr.status);
+                        alert(xhr.message);
                         alert(thrownError);
+                        $('#search').prop('disabled', false);
+                        $("#search").html('Search');
+                        $('#search span').remove()
+                        $('#search span').remove()
                     }
                 });
             });
