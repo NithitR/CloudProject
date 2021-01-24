@@ -2,20 +2,13 @@
 <script src="https://unpkg.com/amazon-quicksight-embedding-sdk@1.0.12/dist/quicksight-embedding-js-sdk.min.js"></script>
 <script src="/js/dashboard.js"></script>
 <script>
-    function initMap() {
+    function initDashboard() {
         var url = "<%= embedUrl %>";
         url = url.replace(/&amp;/g, '&');
         console.log(url);
         var options = {
             url: url,
             container: document.getElementById("embeddingContainer"),
-            parameters: {
-                country: "United States",
-                states: [
-                    "California",
-                    "Washington"
-                ]
-            },
             scrolling: "no",
             height: "1000px",
             width: "100%",
@@ -30,9 +23,25 @@
 
     }
 </script>
-<body onload="initMap()">
-    <div id="embeddingContainer" >
+<style>
+    .spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -20px;
+        margin-left: -25px;
+        text-align: center;
+        z-index: -1;
+    }
 
+</style>
+<body onload="initDashboard()" id="main">
+    <div id="embeddingContainer" >
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border spinner" role="status">
+            </div>
+
+        </div>
     </div>
 
 </body>
