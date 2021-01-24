@@ -6,11 +6,8 @@ app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
 
-app.get('/', function (req, res) {
-    res.render('index', {user: 'FOO'});
-})
 
-app.get('/analysis', async function (req, res) {
+app.get('/', async function (req, res) {
     // let embedUrl = aws.getQuickSightUrl();
     let embedUrl = await aws.getUrl();
     console.log(embedUrl);
