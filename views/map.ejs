@@ -61,6 +61,8 @@
                         console.log(data);
                         if(data.data.length){
                             updateMap();
+                        }else{
+                            alert(`No data from this query Severity : ${severity} , Year : ${year} , LGA : ${iga}`);
                         }
                         $('#search').prop('disabled', false);
                         $("#search").html('Search');
