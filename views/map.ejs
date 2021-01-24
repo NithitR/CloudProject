@@ -50,13 +50,6 @@
                     dataType: 'json',
                     contentType: "application/json",
                     success: function (data) {
-
-                        $('input[type="text"]').keyup(function() {
-                            if($(this).val() != '') {
-                                $(':input[type="submit"]').prop('disabled', false);
-                            }
-                        });
-
                         locations = data.data;
                         console.log(data);
                         if(data.data.length){

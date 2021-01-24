@@ -1,4 +1,82 @@
 <%- include('layout') -%>
-<div class="container-fluid">
-    <p>Hello export</p>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.23/datatables.min.css"/>
+
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.23/datatables.min.js"></script>
+<!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.23/datatables.min.css"/>-->
+
+<!--<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.23/datatables.min.js"></script>-->
+
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/dataTables.buttons.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('#dataTable').DataTable({
+            dom: 'Bfrtip',
+            "ajax": {
+                "url": 'https://0xjid9363a.execute-api.us-east-1.amazonaws.com/roadAccidentAnalytic/roadaccidentdetail?table=' + true,
+                "dataType": 'json',
+                "type": "GET",
+                "headers": {
+                    "Authorization": "AWS4-HMAC-SHA256 Credential=AKIAVSLBGXBARSILIX6E/20210124/us-east-1/execute-api/aws4_request, SignedHeaders=content-type;host;x-amz-date, Signature=30d5c620fd0fc8cc6b7741180ac30ae059143dfaaef5ce08206c429cc715c0cb"
+                },
+            },
+            "buttons": [
+                {
+                    text: 'Export CSV',
+                    action: function ( e, dt, node, config ) {
+                        $.ajax({
+                            type: "GET",
+                            url: "https://0xjid9363a.execute-api.us-east-1.amazonaws.com/roadAccidentAnalytic/roadaccidentdetail?export="+true,
+                            crossDomain: true,
+                            headers: {
+                                "Authorization": "AWS4-HMAC-SHA256 Credential=AKIAVSLBGXBARSILIX6E/20210124/us-east-1/execute-api/aws4_request, SignedHeaders=content-type;host;x-amz-date, Signature=30d5c620fd0fc8cc6b7741180ac30ae059143dfaaef5ce08206c429cc715c0cb"
+                            },
+                            dataType: 'json',
+                            contentType: "application/json",
+                            success: function (data) {
+                                let url = data.data;
+                                console.log(data);
+                                window.open(url, '_blank');
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                alert(xhr.status);
+                                alert(thrownError);
+                            }
+                        });
+
+                    }
+                }
+            ],
+            "info":false,
+            "columns": [
+                {"data": "accident_no"},
+                {"data": "severity"},
+                {"data": "lga_name_all"},
+                {"data": "road_geometry"},
+                {"data": "accident_type"},
+                {"data": "accident_date"},
+            ]
+        });
+    });
+</script>
+<div style="margin-left: 5%;margin-right: 5%; margin-top: 2%">
+    <h5>Example exported data set 200 records</h5>
+    <div class="card">
+        <div class="card-body">
+            <table id="dataTable" class="display" style="width:100%">
+                <thead>
+                <tr>
+                    <th>Accident No.</th>
+                    <th>Severity</th>
+                    <th>LGA</th>
+                    <th>Road Geometry</th>
+                    <th>Accident Type</th>
+                    <th>Accident Date</th>
+                </tr>
+                </thead>
+            </table>
+
+        </div>
+    </div>
+
 </div>
