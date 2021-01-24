@@ -4,10 +4,142 @@
 </script>
 <script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
 
-<script src="/js/map.js"></script>
+<script>
+    let markers = [];
+    let markerClusters = [];
+    let map = null;
+    let locations = <%- JSON.stringify(data) %>
+        $(document).ready(function () {
+            $("#search").click(function (e) {
+                e.preventDefault();
+                let acc_type = $("#acc_type").val();
+                let year = $("#acc_year").val();
+                let iga = $("#acc_lga").val();
+                console.log(markers.length);
+                if (markers.length) {
+                    console.log('xx');
+                    for (var i = 0; i < markers.length; i++) {
+                        markers[i].setMap(null);
+                    }
+                    markers = [];
+                }
+                if (markerClusters.length) {
+                    console.log('xxx');
+                    markerClusters.clearMarkers();
+                }
+                // Reset the markers array
 
-<div class="container-fluid">
-    <p>Hello map</p>
+                console.log(acc_type, year, iga);
+                let queryString = encodeURI(`?acc_type=${acc_type}&accident_date=${year}&lga_name_al${iga}`);
+                console.log(queryString);
+                $.ajax({
+                    type: "GET",
+                    url: "https://0xjid9363a.execute-api.us-east-1.amazonaws.com/roadAccidentAnalytic/roadaccidentdetail" + queryString,
+                    cache: false,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("Authorization", "AWS4-HMAC-SHA256 Credential=AKIAVSLBGXBARSILIX6E/20210124/us-east-1/execute-api/aws4_request, SignedHeaders=content-type;host;x-amz-date, Signature=30d5c620fd0fc8cc6b7741180ac30ae059143dfaaef5ce08206c429cc715c0cb");
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        // locations = [{
+                        //     accident_no: 'T20130013744',
+                        //     latitude: -37.82156,
+                        //     longitude: 145.02638,
+                        //     severity: 'Other injury accident',
+                        //     lga_name_all: 'BOROONDARA',
+                        //     road_geometry: 'Cross intersection',
+                        //     accident_type: 'Collision with vehicle'
+                        // }]
+                        locations = data;
+                        updateMap();
+                    }
+                });
+            });
+
+            function initMap() {
+                map = new google.maps.Map(document.getElementById("map"), {
+                    zoom: 8,
+                    center: {lat: -37.81961, lng: 144.968119},
+                    //victoria
+                });
+            }
+
+            function updateMap() {
+                const contentString = "test";
+                const infowindow = new google.maps.InfoWindow({
+                    content: contentString,
+                });
+                markers = locations.map((location, i) => {
+                    let marker = new google.maps.Marker({
+                        position: {lat: location.latitude, lng: location.longitude},
+                        // label: location.accident_no,
+                    });
+                    google.maps.event.addListener(marker, 'click', (function (marker, contentString, infowindow) {
+                        return function () {
+                            let content = `<div id="content">
+                                        <h2 id="firstHeading" class="firstHeading">Road Accident Detail</h2>
+                                        <p>Severity : ${location.severity}</p>
+                                        <p>LGA name : ${location.lga_name_all}</p>
+                                        <p>Road geometry : ${location.road_geometry}</p>
+                                        <p>Accident type : ${location.accident_type}</p>
+                                        </div>`;
+                            infowindow.setContent(content);
+                            infowindow.open(map, marker);
+                        };
+                    })(marker, contentString, infowindow));
+                    return marker;
+                });
+                // Add a marker clusterer to manage the markers.
+                markerClusters = new MarkerClusterer(map, markers, {
+                    imagePath:
+                        "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+                });
+
+            }
+
+            initMap();
+        });
+
+
+</script>
+
+<div style="margin-left: 5%;margin-right: 5%; margin-top: 2%">
+    <form>
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label for="acc_type">Severity</label>
+                <select id="acc_type" class="form-control">
+                    <option selected value="Other injury accident">Other injury accident</option>
+                    <option value="Non injury accident">Non injury accident</option>
+                    <option value="Fatal accident">Fatal accident</option>
+                    <option value="Serious injury accident">Serious injury accident</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="acc_year">Year</label>
+                <select id="acc_year" class="form-control">
+                    <option selected value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                    <option value="2014">2014</option>
+                    <option value="2013">2013</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="acc_lga">LGA name</label>
+                <select id="acc_lga" class="form-control">
+                    <% lga_list.forEach(function(lga){ %>
+                        <option value="<%- lga %>"><%- lga %></option>
+                    <% }); %>
+                </select>
+            </div>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary" id="search">Search</button>
+    </form>
+
 
 </div>
-<div id="map"></div>
+<div id="map" style="margin-left: 5%;margin-right: 5%;margin-top: 2%"></div>
